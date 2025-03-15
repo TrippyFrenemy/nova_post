@@ -43,4 +43,4 @@ jobs:
         env:
           NOVA_POST_API_KEY: ${{ secrets.NOVA_POST_API_KEY }}
           NOVA_POST_TRACKING_NUMBER: ${{ secrets.NOVA_POST_TRACKING_NUMBER }}
-        run: pytest tests/
+        run: pytest -v tests/
