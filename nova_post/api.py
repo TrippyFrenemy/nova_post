@@ -37,11 +37,6 @@ class NovaPostApi:
 
         return result['data']
 
-    def __init__(self, api_key: str):
-        self.api_key = api_key
-        self.session = requests.Session()
-        self._adapters_cache = {}
-
     def __getattr__(self, adapter_name: str):
         if adapter_name in self._adapters_cache:
             return self._adapters_cache[adapter_name]
