@@ -3,6 +3,7 @@ import pytest
 from dotenv import load_dotenv
 from nova_post.api import NovaPostApi
 from nova_post.exceptions import NovaPostApiError
+from nova_post.logger import logger
 
 load_dotenv()
 
@@ -20,7 +21,7 @@ def test_track_parcel_not_found(api):
 
     try:
         result = api.tracking.track_parcel(tracking_number=tracking_number)
-        print(result)
+        logger.info(result)
         assert result.Number == tracking_number
         assert result.Status == "Номер не знайдено"
     except NovaPostApiError as e:
@@ -32,7 +33,7 @@ def test_track_parcel_delivered(api):
 
     try:
         result = api.tracking.track_parcel(tracking_number=tracking_number)
-        print(result)
+        logger.info(result)
         assert result.Number == tracking_number
         assert result.Status == "Відправлення отримано"
     except NovaPostApiError as e:

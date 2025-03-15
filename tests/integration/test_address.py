@@ -3,6 +3,8 @@ import pytest
 from dotenv import load_dotenv
 from nova_post.api import NovaPostApi
 from nova_post.exceptions import NovaPostApiError
+from nova_post.logger import logger
+
 
 load_dotenv()
 
@@ -19,7 +21,7 @@ def test_get_cities(api):
     try:
         cities = api.address.get_cities()
         assert len(cities) > 0
-        print(cities[0])
+        logger.info(cities[0])
     except NovaPostApiError as e:
         pytest.fail(f"API вернул ошибку: {e}")
 
@@ -29,7 +31,7 @@ def test_get_warehouses(api):
     try:
         warehouses = api.address.get_warehouses(city_ref)
         assert len(warehouses) > 0
-        print(warehouses[0])
+        logger.info(warehouses[0])
     except NovaPostApiError as e:
         pytest.fail(f"API вернул ошибку: {e}")
 
@@ -41,7 +43,7 @@ def test_get_warehouse(api):
         warehouse = api.address.get_warehouse(city_ref, warehouse_number)
         assert warehouse is not None
         assert warehouse.Number == warehouse_number
-        print(warehouse)
+        logger.info(warehouse)
     except NovaPostApiError as e:
         pytest.fail(f"API вернул ошибку: {e}")
 
@@ -51,7 +53,7 @@ def test_get_streets(api):
     try:
         streets = api.address.get_streets(city_ref)
         assert len(streets) > 0
-        print(streets[0])
+        logger.info(streets[0])
     except NovaPostApiError as e:
         pytest.fail(f"API вернул ошибку: {e}")
 
@@ -61,7 +63,7 @@ def test_get_areas(api):
     try:
         areas = api.address.get_areas()
         assert len(areas) > 0
-        print(areas[0])
+        logger.info(areas[0])
     except NovaPostApiError as e:
         pytest.fail(f"API вернул ошибку: {e}")
 
@@ -71,7 +73,7 @@ def test_get_cities_with_filter(api):
         cities = api.address.get_cities(find_by_string="Київ", limit=5)
         assert len(cities) > 0
         assert "Київ" in cities[0].Description
-        print(cities)
+        logger.info(cities)
     except NovaPostApiError as e:
         pytest.fail(f"API вернул ошибку: {e}")
 
@@ -81,7 +83,7 @@ def test_get_streets_with_filter(api):
     try:
         streets = api.address.get_streets(city_ref, find_by_string="Шевченка", limit=5)
         assert len(streets) > 0
-        print(streets)
+        logger.info(streets)
     except NovaPostApiError as e:
         pytest.fail(f"API вернул ошибку: {e}")
 
@@ -96,7 +98,7 @@ def test_get_city_by_ref(api):
 
     assert len(city) == 1, "Город с данным Ref не найден!"
     assert city[0].Ref == city_ref
-    print(city[0])
+    logger.info(city[0])
 
 
 def test_get_warehouse_by_ref(api):
@@ -110,7 +112,7 @@ def test_get_warehouse_by_ref(api):
     warehouse = api.address.get_warehouse(warehouse_ref)
 
     assert warehouse is not None, "Отделение с данным Ref не найдено!"
-    print(warehouse)
+    logger.info(warehouse)
 
 
 def test_get_street_by_ref(api):
@@ -125,6 +127,6 @@ def test_get_street_by_ref(api):
 
     assert len(street) == 1, "Улица с данным Ref не найдена!"
     assert street[0].Ref == street_ref
-    print(street[0])
+    logger.info(street[0])
 
 # TODO Настроить тесты для get_settlements

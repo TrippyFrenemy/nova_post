@@ -6,13 +6,14 @@ from .logger import logger
 
 class NovaPostApi:
     API_URL = "https://api.novaposhta.ua/v2.0/json/"
+    DEFAULT_TIMEOUT = 10
 
     def __init__(self, api_key: str):
         self.api_key = api_key
         self.session = requests.Session()
         self._adapters_cache = {}
 
-    def send_request(self, model: str, method: str, properties: dict):
+    def send_request(self, model: str, method: str, properties: dict, timeout: int = DEFAULT_TIMEOUT):
         payload = {
             "apiKey": self.api_key,
             "modelName": model,
@@ -22,10 +23,12 @@ class NovaPostApi:
 
         logger.info(f"Запрос: {payload}")
 
-        response = self.session.post(self.API_URL, json=payload)
-
         try:
+            response = self.session.post(self.API_URL, json=payload, timeout=timeout)
             result = response.json()
+        except requests.Timeout:
+            logger.error(f"Ошибка: запрос к {model}/{method} превысил {timeout} секунд")
+            raise NovaPostApiError(f"Таймаут запроса: {timeout} секунд")
         except ValueError as e:
             logger.error("Ошибка JSON: Некорректный ответ")
             raise NovaPostApiError("Некорректный JSON ответ API")

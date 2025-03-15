@@ -12,10 +12,10 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest #${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-#        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ['3.10', '3.11', '3.12']
       fail-fast: false
     steps:
@@ -27,11 +27,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Cache Python packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.local/lib/python${{ matrix.python-version }}/site-packages
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+#      - name: Cache Python packages
+#        uses: actions/cache@v4
+#        with:
+#          path: ~/.local/lib/python${{ matrix.python-version }}/site-packages
+#          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
 #          restore-keys: |
 #            ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
@@ -44,4 +44,4 @@ jobs:
         env:
           NOVA_POST_API_KEY: ${{ secrets.NOVA_POST_API_KEY }}
           NOVA_POST_TRACKING_NUMBER: ${{ secrets.NOVA_POST_TRACKING_NUMBER }}
-        run: pytest -v tests/
+        run: pytest tests/
