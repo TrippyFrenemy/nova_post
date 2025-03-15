@@ -17,6 +17,7 @@ jobs:
       matrix:
 #        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ['3.10', '3.11', '3.12']
+      fail-fast: false
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -27,12 +28,12 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Cache Python packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.local/lib/python${{ matrix.python-version }}/site-packages
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+#          restore-keys: |
+#            ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
       - name: Install dependencies
         run: |
