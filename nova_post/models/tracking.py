@@ -1,11 +1,13 @@
+from typing import Optional
 from pydantic import BaseModel
 
 
 class ParcelStatus(BaseModel):
     Number: str
     Status: str
-    WarehouseRecipient: str
-    WarehouseSender: str | None = None
-    CityRecipient: str | None = None
-    CitySender: str | None = None
-    RecipientDateTime: str | None = None
+    WarehouseRecipient: Optional[str] = None
+    WarehouseSender: Optional[str] = None
+    CityRecipient: Optional[str] = None
+    CitySender: Optional[str] = None
+    RecipientDateTime: Optional[str] = None
+    Phone: Optional[str] = None

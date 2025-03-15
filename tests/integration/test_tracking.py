@@ -38,3 +38,15 @@ def test_track_parcel_delivered(api):
         assert result.Status == "Відправлення отримано"
     except NovaPostApiError as e:
         pytest.fail(f"API returned error: {e}")
+
+
+def test_track_parcel_delivered_with_phone(api):
+    tracking_number = os.getenv("NOVA_POST_TRACKING_NUMBER")
+    phone = "380991234567"
+    try:
+        result = api.tracking.track_parcel(tracking_number=tracking_number, phone=phone)
+        logger.info(result)
+        assert result.Number == tracking_number
+        assert result.Status == "Відправлення отримано"
+    except NovaPostApiError as e:
+        pytest.fail(f"API returned error: {e}")
