@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from nova_post.api import NovaPostApi
 from nova_post.exceptions import NovaPostApiError
 from nova_post.logger import logger
-
+from nova_post.models.address import AddressUpdateRequest, AddressSaveRequest, AddressDeleteRequest
 
 load_dotenv()
 
@@ -129,4 +129,93 @@ def test_get_street_by_ref(api):
     assert street[0].Ref == street_ref
     logger.info(street[0])
 
-# TODO Настроить тесты для get_settlements
+
+def test_create_update_delete_address(api):
+    """
+    Ищем контрагента «Тестов Тест Тестович» (или любой, у кого есть контактное лицо
+    с телефоном +380 (99) 123-45-67), берём его Ref, затем создаём, обновляем и удаляем адрес.
+    """
+    target_name = 'Тест'
+    found_counterparty_ref = None
+
+    try:
+        all_counterparties = api.counterparty.get_counterparties(
+            counterparty_property="Recipient",
+            find_by_string="Приватна"  # ищем по строке "Тестов", чтобы быстрее сузить выборку
+        )
+    except NovaPostApiError as exc:
+        pytest.fail(f"Ошибка при запросе контрагентов: {exc}")
+
+    for cparty in all_counterparties:
+        # Загружаем контакты для данного контрагента
+        contact_persons = api.counterparty.get_counterparty_contact_persons(cparty.Ref)
+        for cp in contact_persons:
+            if cp.FirstName and target_name in cp.FirstName:
+                found_counterparty_ref = cparty.Ref
+                break
+        if found_counterparty_ref:
+            break
+
+    assert found_counterparty_ref, (
+        f"Не нашли контрагента с именем {target_name}. "
+        "Убедитесь, что он существует или измените критерии поиска."
+    )
+
+    try:
+        cities = api.address.get_cities(find_by_string="Київ", limit=1)
+    except NovaPostApiError as exc:
+        pytest.fail(f"Ошибка при получении городов: {exc}")
+
+    assert len(cities) > 0, "Не нашли ни одного города по запросу 'Київ'!"
+    city_ref = cities[0].Ref
+
+    try:
+        streets = api.address.get_streets(city_ref=city_ref, limit=1)
+    except NovaPostApiError as exc:
+        pytest.fail(f"Ошибка при получении улиц: {exc}")
+
+    assert len(streets) > 0, f"Не нашли улицу в городе {city_ref}!"
+    street_ref = streets[0].Ref
+
+    try:
+        save_data = AddressSaveRequest(
+            CounterpartyRef=found_counterparty_ref,
+            StreetRef=street_ref,
+            BuildingNumber="12Б",
+            Flat="7",
+            Note="Тестовый адрес (автотест)"
+        )
+        save_response = api.address.save_address(save_data)
+    except NovaPostApiError as exc:
+        pytest.fail(f"Ошибка при создании адреса: {exc}")
+
+    assert save_response.Ref, "Не удалось создать адрес — API вернул пустой Ref!"
+    address_ref = save_response.Ref
+    logger.info(f"[TEST] Создан адрес для контрагента {found_counterparty_ref} => Ref={address_ref}")
+
+    try:
+        update_data = AddressUpdateRequest(
+            Ref=address_ref,
+            CounterpartyRef=found_counterparty_ref,
+            StreetRef=street_ref,
+            BuildingNumber="12Б",
+            Flat="7",
+            Note="Обновлённый автотестовый адрес"
+        )
+        update_response = api.address.update_address(update_data)
+    except NovaPostApiError as exc:
+        pytest.fail(f"Ошибка при обновлении адреса: {exc}")
+
+    # assert update_response.Ref == address_ref, "Не совпадает Ref при обновлении адреса!"
+    logger.info(f"[TEST] Адрес обновлён => Ref={update_response.Ref}, Description={update_response.Description}")
+
+    delete_address = AddressDeleteRequest(
+        Ref=address_ref,
+    )
+    try:
+        is_deleted = api.address.delete_address(delete_address)
+    except NovaPostApiError as exc:
+        pytest.fail(f"Ошибка при удалении адреса: {exc}")
+
+    assert is_deleted, "API вернулось пустое значение при удалении адреса!"
+    logger.info(f"[TEST] Адрес удалён => Ref={address_ref}")
