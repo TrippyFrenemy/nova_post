@@ -1,19 +1,16 @@
 from typing import Optional
-from ..models.tracking import ParcelStatus
+from ..models.tracking import TrackingRequest, TrackingResponse
 
 
 class Tracking:
     def __init__(self, api):
         self.api = api
 
-    def track_parcel(self, tracking_number: str, phone: Optional[str] = None) -> ParcelStatus:
+    def track_parcel(self, data: TrackingRequest) -> TrackingResponse:
         """Отслеживание посылки по номеру отправления и (опционально) номеру телефона"""
         properties = {
-            "Documents": [{"DocumentNumber": tracking_number}]
+            "Documents": [data.model_dump(exclude_unset=True)]
         }
 
-        if phone:
-            properties["Documents"][0]["Phone"] = phone
-
         result = self.api.send_request("TrackingDocument", "getStatusDocuments", properties)
-        return ParcelStatus(**result[0])
+        return TrackingResponse.model_validate(result[0])

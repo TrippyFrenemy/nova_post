@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from nova_post.api import NovaPostApi
 from nova_post.exceptions import NovaPostApiError
 from nova_post.logger import logger
+from nova_post.models.tracking import TrackingRequest
 
 load_dotenv()
 
@@ -18,9 +19,13 @@ def api():
 
 def test_track_parcel_not_found(api):
     tracking_number = "20400048799000"
+    tracking = TrackingRequest(
+        DocumentNumber=tracking_number
+    )
+
 
     try:
-        result = api.tracking.track_parcel(tracking_number=tracking_number)
+        result = api.tracking.track_parcel(tracking)
         logger.info(result)
         assert result.Number == tracking_number
         assert result.Status == "Номер не знайдено"
@@ -30,9 +35,12 @@ def test_track_parcel_not_found(api):
 
 def test_track_parcel_delivered(api):
     tracking_number = os.getenv("NOVA_POST_TRACKING_NUMBER")
+    tracking = TrackingRequest(
+        DocumentNumber=tracking_number
+    )
 
     try:
-        result = api.tracking.track_parcel(tracking_number=tracking_number)
+        result = api.tracking.track_parcel(tracking)
         logger.info(result)
         assert result.Number == tracking_number
         assert result.Status == "Відправлення отримано"
@@ -43,8 +51,12 @@ def test_track_parcel_delivered(api):
 def test_track_parcel_delivered_with_phone(api):
     tracking_number = os.getenv("NOVA_POST_TRACKING_NUMBER")
     phone = "380991234567"
+    tracking = TrackingRequest(
+        DocumentNumber=tracking_number,
+        Phone=phone
+    )
     try:
-        result = api.tracking.track_parcel(tracking_number=tracking_number, phone=phone)
+        result = api.tracking.track_parcel(tracking)
         logger.info(result)
         assert result.Number == tracking_number
         assert result.Status == "Відправлення отримано"
