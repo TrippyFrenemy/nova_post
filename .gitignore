@@ -174,3 +174,4 @@ cython_debug/
 .pypirc
 
 main.py
+*_instructions.txt
