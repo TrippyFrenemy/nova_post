@@ -1,9 +1,9 @@
 from typing import List, Optional
+
 from ..models.address import (
-    City, Warehouse, Street, Area, Settlement,
-    AddressSaveRequest, AddressUpdateRequest, AddressDeleteRequest, AddressResponse,
+    City, Warehouse, Street, Area, AddressSaveRequest, AddressUpdateRequest, AddressDeleteRequest, AddressResponse,
     SearchSettlementsRequest, SearchSettlementsResponse, SearchSettlementsItem,
-    SearchSettlementStreetsRequest, SearchSettlementStreetsResponse, SearchSettlementStreetsItem,
+    SearchSettlementStreetsResponse, SearchSettlementStreetsItem,
 )
 
 

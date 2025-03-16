@@ -1,5 +1,6 @@
+from typing import Optional
+
 from pydantic import BaseModel
-from typing import Optional, List
 
 
 class CounterpartyRequest(BaseModel):
@@ -68,4 +69,3 @@ class GetCounterpartiesResponse(BaseModel):
     OwnershipFormDescription: Optional[str]
     EDRPOU: Optional[str]
     CounterpartyType: Optional[str]
-

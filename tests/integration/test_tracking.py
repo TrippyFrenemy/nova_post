@@ -1,6 +1,8 @@
 import os
+
 import pytest
 from dotenv import load_dotenv
+
 from nova_post.api import NovaPostApi
 from nova_post.exceptions import NovaPostApiError
 from nova_post.logger import logger
@@ -22,7 +24,6 @@ def test_track_parcel_not_found(api):
     tracking = TrackingRequest(
         DocumentNumber=tracking_number
     )
-
 
     try:
         result = api.tracking.track_parcel(tracking)

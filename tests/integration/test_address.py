@@ -1,6 +1,8 @@
 import os
+
 import pytest
 from dotenv import load_dotenv
+
 from nova_post.api import NovaPostApi
 from nova_post.exceptions import NovaPostApiError
 from nova_post.logger import logger

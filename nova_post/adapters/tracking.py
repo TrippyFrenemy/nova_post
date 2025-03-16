@@ -1,4 +1,3 @@
-from typing import Optional
 from ..models.tracking import TrackingRequest, TrackingResponse
 
 
