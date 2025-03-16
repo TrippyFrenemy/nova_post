@@ -16,7 +16,7 @@ def api():
     api_key = os.getenv("NOVA_POST_API_KEY")
     if not api_key:
         raise RuntimeError("Не задан API-ключ для интеграционных тестов!")
-    return NovaPostApi(api_key)
+    return NovaPostApi(api_key, True)
 
 
 def test_track_parcel_not_found(api):

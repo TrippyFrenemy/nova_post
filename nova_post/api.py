@@ -1,3 +1,5 @@
+import time
+
 import requests
 import importlib
 from .exceptions import NovaPostApiError
@@ -8,9 +10,10 @@ class NovaPostApi:
     API_URL = "https://api.novaposhta.ua/v2.0/json/"
     DEFAULT_TIMEOUT = 10
 
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: str, sleep: bool = False):
         self.api_key = api_key
         self.session = requests.Session()
+        self.sleep = sleep
         self._adapters_cache = {}
 
     def send_request(self, model: str, method: str, properties: dict, timeout: int = DEFAULT_TIMEOUT):
@@ -37,6 +40,9 @@ class NovaPostApi:
             errors = result.get('errors', ["Неизвестная ошибка API"])
             logger.error(f"Ошибка API: {errors}")
             raise NovaPostApiError(errors)
+
+        if self.sleep:
+            time.sleep(self.DEFAULT_TIMEOUT/5)
 
         return result['data']
 
