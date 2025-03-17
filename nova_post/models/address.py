@@ -75,13 +75,42 @@ class AddressResponse(BaseModel):
     Description: Optional[str] = None
 
 
+class GetCitiesRequest(BaseModel):
+    """Модель запроса списка городов."""
+    FindByString: Optional[str] = None
+    Ref: Optional[str] = None
+    Limit: Optional[int] = None
+    Page: Optional[int] = None
+    Warehouse: Optional[str] = None
+
+
+class GetWarehousesRequest(BaseModel):
+    """Модель запроса списка отделений."""
+    CityRef: Optional[str] = None
+    WarehouseRef: Optional[str] = None
+    Limit: Optional[int] = None
+    Page: Optional[int] = None
+    FindByString: Optional[str] = None
+
+
+class GetStreetsRequest(BaseModel):
+    """Модель запроса списка улиц."""
+    CityRef: str
+    FindByString: Optional[str] = None
+    Ref: Optional[str] = None
+    Limit: Optional[int] = None
+    Page: Optional[int] = None
+
+
 class SearchSettlementsRequest(BaseModel):
+    """Запрос на поиск населённых пунктов."""
     CityName: str
     Limit: int = 50
     Page: int = 1
 
 
 class SearchSettlementsItem(BaseModel):
+    """Элемент результата поиска населённых пунктов."""
     Present: str
     Warehouses: str
     MainDescription: str
@@ -93,17 +122,20 @@ class SearchSettlementsItem(BaseModel):
 
 
 class SearchSettlementsResponse(BaseModel):
+    """Ответ на поиск населённых пунктов."""
     TotalCount: Optional[str] = None
     Addresses: List[SearchSettlementsItem] = []
 
 
 class SearchSettlementStreetsRequest(BaseModel):
+    """Запрос на поиск улиц в населенном пункте."""
     SettlementRef: str
     StreetName: str
     Limit: int = 50
 
 
 class SearchSettlementStreetsItem(BaseModel):
+    """Элемент результата поиска улиц."""
     SettlementRef: str
     SettlementStreetRef: str
     SettlementStreetDescription: str
@@ -113,5 +145,6 @@ class SearchSettlementStreetsItem(BaseModel):
 
 
 class SearchSettlementStreetsResponse(BaseModel):
+    """Ответ на поиск улиц в населенном пункте."""
     TotalCount: Optional[str] = None
     Addresses: List[SearchSettlementStreetsItem] = []
