@@ -25,38 +25,15 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests address
+      - name: Run all unit tests
         env:
           NOVA_POST_API_KEY: ${{ secrets.NOVA_POST_API_KEY }}
           NOVA_POST_TRACKING_NUMBER: ${{ secrets.NOVA_POST_TRACKING_NUMBER }}
-        run: pytest tests/integration/test_address.py
-
-      - name: Run tests api
-        env:
-          NOVA_POST_API_KEY: ${{ secrets.NOVA_POST_API_KEY }}
-          NOVA_POST_TRACKING_NUMBER: ${{ secrets.NOVA_POST_TRACKING_NUMBER }}
-        run: pytest tests/integration/test_api.py
-
-      - name: Run tests common
-        env:
-          NOVA_POST_API_KEY: ${{ secrets.NOVA_POST_API_KEY }}
-          NOVA_POST_TRACKING_NUMBER: ${{ secrets.NOVA_POST_TRACKING_NUMBER }}
-        run: pytest tests/integration/test_common.py
-
-      - name: Run tests counterparty
-        env:
-          NOVA_POST_API_KEY: ${{ secrets.NOVA_POST_API_KEY }}
-          NOVA_POST_TRACKING_NUMBER: ${{ secrets.NOVA_POST_TRACKING_NUMBER }}
-        run: pytest tests/integration/test_counterparty.py
-
-      - name: Run tests tracking
-        env:
-          NOVA_POST_API_KEY: ${{ secrets.NOVA_POST_API_KEY }}
-          NOVA_POST_TRACKING_NUMBER: ${{ secrets.NOVA_POST_TRACKING_NUMBER }}
-        run: pytest tests/integration/test_tracking.py
+        run: pytest tests/unit/
