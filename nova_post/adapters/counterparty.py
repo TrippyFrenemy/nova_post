@@ -1,14 +1,15 @@
 from typing import List, Optional
+
+from ..models.contact_person import (
+    ContactPersonRequest,
+    ContactPersonResponse
+)
 from ..models.counterparty import (
     CounterpartyRequest,
     CounterpartyResponse,
     CounterpartyOptions,
     CounterpartyAddress,
     GetCounterpartiesResponse,
-)
-from ..models.contact_person import (
-    ContactPersonRequest,
-    ContactPersonResponse
 )
 
 

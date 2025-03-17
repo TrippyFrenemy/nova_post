@@ -1,4 +1,5 @@
 import pytest
+
 from nova_post.api import NovaPostApi
 from nova_post.exceptions import NovaPostApiError
 

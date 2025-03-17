@@ -1,9 +1,10 @@
+from unittest.mock import MagicMock
+
 import pytest
-from unittest.mock import MagicMock, ANY
+
 from nova_post.api import NovaPostApi
-from nova_post.exceptions import NovaPostApiError
-from nova_post.models.counterparty import CounterpartyRequest
 from nova_post.models.contact_person import ContactPersonRequest
+from nova_post.models.counterparty import CounterpartyRequest
 
 
 @pytest.fixture

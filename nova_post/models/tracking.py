@@ -1,8 +1,14 @@
 from typing import Optional
+
 from pydantic import BaseModel
 
 
-class ParcelStatus(BaseModel):
+class TrackingRequest(BaseModel):
+    DocumentNumber: str
+    Phone: Optional[str] = None
+
+
+class TrackingResponse(BaseModel):
     Number: str
     Status: str
     WarehouseRecipient: Optional[str] = None
