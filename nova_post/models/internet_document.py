@@ -1,8 +1,27 @@
 from typing import List, Optional
+
 from pydantic import BaseModel
 
 
-class GetDocumentPriceRequest(BaseModel):
+class DocumentPriceRequest(BaseModel):
+    """
+    Запит на розрахунок вартості доставки.
+
+    Атрибути:
+    - `CitySender` (str): Ідентифікатор міста відправника.
+    - `CityRecipient` (str): Ідентифікатор міста отримувача.
+    - `Weight` (float): Фактична вага відправлення.
+    - `ServiceType` (str): Тип послуги (наприклад, "WarehouseWarehouse").
+    - `Cost` (Optional[int]): Оціночна вартість вантажу (за замовчуванням 300 грн).
+    - `CargoType` (str): Тип вантажу (наприклад, "Cargo", "Documents").
+    - `SeatsAmount` (int): Кількість місць у відправленні.
+    - `RedeliveryCalculate` (Optional[dict]): Параметри зворотної доставки (необов’язково).
+    - `PackCount` (Optional[int]): Кількість пакувань (необов’язково).
+    - `PackRef` (Optional[str]): Ідентифікатор пакування (необов’язково).
+    - `Amount` (Optional[int]): Сума зворотної доставки (необов’язково).
+    - `CargoDetails` (Optional[List[dict]]): Деталі вантажу (необов’язково).
+    - `CargoDescription` (Optional[str]): Ідентифікатор типу відправлення (необов’язково).
+    """
     CitySender: str
     CityRecipient: str
     Weight: float
@@ -19,6 +38,16 @@ class GetDocumentPriceRequest(BaseModel):
 
 
 class DocumentPriceResponse(BaseModel):
+    """
+    Відповідь із розрахованою вартістю доставки.
+
+    Атрибути:
+    - `AssessedCost` (int): Оціночна вартість вантажу.
+    - `Cost` (int): Вартість доставки.
+    - `CostRedelivery` (Optional[str]): Вартість зворотної доставки (необов’язково).
+    - `TZoneInfo` (Optional[dict]): Інформація про тарифну зону доставки (необов’язково).
+    - `CostPack` (Optional[str]): Вартість пакування (необов’язково).
+    """
     AssessedCost: int
     Cost: int
     CostRedelivery: Optional[str] = None
@@ -26,7 +55,16 @@ class DocumentPriceResponse(BaseModel):
     CostPack: Optional[str] = None
 
 
-class GetDocumentDeliveryDateRequest(BaseModel):
+class DocumentDeliveryDateRequest(BaseModel):
+    """
+    Запит на отримання прогнозованої дати доставки.
+
+    Атрибути:
+    - `DateTime` (Optional[str]): Дата створення експрес-накладної (необов’язково).
+    - `ServiceType` (str): Тип послуги.
+    - `CitySender` (str): Ідентифікатор міста відправника.
+    - `CityRecipient` (str): Ідентифікатор міста отримувача.
+    """
     DateTime: Optional[str] = None
     ServiceType: str
     CitySender: str
@@ -34,10 +72,42 @@ class GetDocumentDeliveryDateRequest(BaseModel):
 
 
 class DocumentDeliveryDateResponse(BaseModel):
+    """
+    Відповідь із прогнозованою датою доставки.
+
+    Атрибути:
+    - `DeliveryDate` (dict): Орієнтовна дата доставки.
+    """
     DeliveryDate: dict
 
 
 class SaveInternetDocumentRequest(BaseModel):
+    """
+    Запит на створення експрес-накладної.
+
+    Атрибути:
+    - `PayerType` (str): Тип платника (Sender, Recipient, ThirdPerson).
+    - `PaymentMethod` (str): Форма розрахунку (Cash/NonCash).
+    - `DateTime` (str): Дата відправки у форматі "дд.мм.рррр".
+    - `CargoType` (str): Тип вантажу.
+    - `Weight` (float): Фактична вага вантажу.
+    - `ServiceType` (str): Технологія доставки.
+    - `SeatsAmount` (int): Кількість місць відправлення.
+    - `Description` (str): Опис вантажу.
+    - `Cost` (int): Оціночна вартість вантажу.
+    - `CitySender` (str): Ідентифікатор міста відправника.
+    - `Sender` (str): Ідентифікатор контрагента-відправника.
+    - `SenderAddress` (str): Ідентифікатор адреси відправника.
+    - `ContactSender` (str): Ідентифікатор контактної особи відправника.
+    - `SendersPhone` (str): Телефон відправника.
+    - `CityRecipient` (str): Ідентифікатор міста отримувача.
+    - `Recipient` (str): Ідентифікатор контрагента-отримувача.
+    - `RecipientAddress` (str): Ідентифікатор адреси отримувача.
+    - `ContactRecipient` (str): Ідентифікатор контактної особи отримувача.
+    - `RecipientsPhone` (str): Телефон отримувача.
+    - `OptionsSeat` (Optional[List[dict]]): Параметри кожного місця (необов’язково).
+    - `BackwardDeliveryData` (Optional[List[dict]]): Інформація про зворотну доставку (необов’язково).
+    """
     PayerType: str
     PaymentMethod: str
     DateTime: str
@@ -62,6 +132,16 @@ class SaveInternetDocumentRequest(BaseModel):
 
 
 class SaveInternetDocumentResponse(BaseModel):
+    """
+    Відповідь із деталями створеної експрес-накладної.
+
+    Атрибути:
+    - `Ref` (str): Ідентифікатор експрес-накладної.
+    - `CostOnSite` (int): Вартість доставки.
+    - `EstimatedDeliveryDate` (str): Орієнтовна дата доставки.
+    - `IntDocNumber` (str): Номер експрес-накладної.
+    - `TypeDocument` (str): Тип експрес-накладної.
+    """
     Ref: str
     CostOnSite: int
     EstimatedDeliveryDate: str
@@ -69,7 +149,16 @@ class SaveInternetDocumentResponse(BaseModel):
     TypeDocument: str
 
 
-class GetDocumentListRequest(BaseModel):
+class DocumentListRequest(BaseModel):
+    """
+    Запит на отримання списку експрес-накладних.
+
+    Атрибути:
+    - `DateTimeFrom` (str): Дата початку періоду пошуку.
+    - `DateTimeTo` (str): Дата завершення періоду пошуку.
+    - `Page` (Optional[int]): Номер сторінки (за замовчуванням 1).
+    - `GetFullList` (Optional[int]): Ознака отримання всього списку (0 – посторінкове завантаження, 1 – весь список).
+    """
     DateTimeFrom: str
     DateTimeTo: str
     Page: Optional[int] = 1
@@ -77,6 +166,20 @@ class GetDocumentListRequest(BaseModel):
 
 
 class DocumentListResponse(BaseModel):
+    """
+    Відповідь із деталями експрес-накладних.
+
+    Атрибути:
+    - `Ref` (str): Ідентифікатор експрес-накладної.
+    - `DateTime` (str): Дата створення накладної.
+    - `IntDocNumber` (str): Номер експрес-накладної.
+    - `Cost` (str): Вартість доставки.
+    - `CitySender` (str): Ідентифікатор міста відправника.
+    - `CityRecipient` (str): Ідентифікатор міста отримувача.
+    - `PayerType` (str): Тип платника.
+    - `StateId` (int): Ідентифікатор статусу накладної.
+    - `StateName` (str): Опис статусу накладної.
+    """
     Ref: str
     DateTime: str
     IntDocNumber: str
@@ -89,20 +192,52 @@ class DocumentListResponse(BaseModel):
 
 
 class DeleteInternetDocumentRequest(BaseModel):
+    """
+    Запит на видалення експрес-накладної.
+
+    Атрибути:
+    - `DocumentRefs` (List[str]): Список ідентифікаторів експрес-накладних для видалення.
+    """
     DocumentRefs: List[str] = None
 
 
 class DeleteInternetDocumentResponse(BaseModel):
+    """
+    Відповідь після видалення експрес-накладної.
+
+    Атрибути:
+    - `Ref` (str): Ідентифікатор видаленої експрес-накладної.
+    """
     Ref: str
 
 
 class GenerateReportRequest(BaseModel):
+    """
+    Запит на створення звіту за накладними.
+
+    Атрибути:
+    - `DocumentRefs` (List[str]): Список ідентифікаторів накладних для звіту.
+    - `Type` (str): Формат звіту ('xls' або 'csv').
+    - `DateTime` (str): Дата формування звіту.
+    """
     DocumentRefs: List[str] = None
-    Type: str  # 'xls' або 'csv'
+    Type: str
     DateTime: str
 
 
 class GenerateReportResponse(BaseModel):
+    """
+    Відповідь із деталями згенерованого звіту.
+
+    Атрибути:
+    - `Ref` (str): Ідентифікатор згенерованого звіту.
+    - `DateTime` (str): Дата створення звіту.
+    - `Weight` (str): Вага вантажу.
+    - `CostOnSite` (str): Вартість доставки.
+    - `PayerType` (str): Тип платника.
+    - `PaymentMethod` (str): Форма оплати.
+    - `IntDocNumber` (str): Номер експрес-накладної.
+    """
     Ref: str
     DateTime: str
     Weight: str
@@ -112,7 +247,16 @@ class GenerateReportResponse(BaseModel):
     IntDocNumber: str
 
 
-class GetEWTemplateListRequest(BaseModel):
+class EWTemplateListRequest(BaseModel):
+    """
+    Запит на отримання списку документів у заявці на виклик кур’єра.
+
+    Атрибути:
+    - `Page` (int): Номер сторінки для пагінації.
+    - `Limit` (int): Кількість записів на сторінці.
+    - `PickupNumber` (str): Номер заявки на виклик кур’єра.
+    - `State` (Optional[str]): Ідентифікатор стану документа (необов’язковий).
+    """
     Page: int
     Limit: int
     PickupNumber: str
@@ -120,6 +264,17 @@ class GetEWTemplateListRequest(BaseModel):
 
 
 class EWTemplateListResponse(BaseModel):
+    """
+    Відповідь із деталями документів у заявці на виклик кур’єра.
+
+    Атрибути:
+    - `EWNumber` (str): Номер експрес-накладної.
+    - `StateId` (str): Ідентифікатор стану документа.
+    - `RecipientCityRef` (str): Ідентифікатор міста отримувача.
+    - `RecipientAddress` (str): Ідентифікатор адреси отримувача.
+    - `Cost` (str): Вартість доставки.
+    - `IntDocNumber` (str): Внутрішній номер експрес-накладної.
+    """
     EWNumber: str
     StateId: str
     RecipientCityRef: str
@@ -129,6 +284,21 @@ class EWTemplateListResponse(BaseModel):
 
 
 class UpdateInternetDocumentRequest(BaseModel):
+    """
+    Запит на оновлення експрес-накладної.
+
+    Атрибути:
+    - `Ref` (str): Ідентифікатор експрес-накладної.
+    - `PayerType` (str): Тип платника.
+    - `PaymentMethod` (str): Форма розрахунку.
+    - `DateTime` (str): Дата відправки.
+    - `CargoType` (str): Тип вантажу.
+    - `Weight` (float): Вага вантажу.
+    - `ServiceType` (str): Тип доставки.
+    - `SeatsAmount` (int): Кількість місць.
+    - `Description` (str): Опис вантажу.
+    - `Cost` (int): Оціночна вартість.
+    """
     Ref: str
     PayerType: str
     PaymentMethod: str
@@ -154,6 +324,16 @@ class UpdateInternetDocumentRequest(BaseModel):
 
 
 class UpdateInternetDocumentResponse(BaseModel):
+    """
+    Відповідь після оновлення експрес-накладної.
+
+    Атрибути:
+    - `Ref` (str): Ідентифікатор експрес-накладної.
+    - `CostOnSite` (str): Вартість доставки після оновлення.
+    - `EstimatedDeliveryDate` (str): Прогнозована дата доставки.
+    - `IntDocNumber` (str): Номер експрес-накладної.
+    - `TypeDocument` (str): Тип експрес-накладної.
+    """
     Ref: str
     CostOnSite: str
     EstimatedDeliveryDate: str

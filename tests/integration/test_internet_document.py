@@ -5,12 +5,14 @@ from dotenv import load_dotenv
 from nova_post.api import NovaPostApi
 from nova_post.exceptions import NovaPostApiError
 from nova_post.logger import logger
+from nova_post.models.contact_person import GetContactPersonRequest
 from nova_post.models.internet_document import (
-    GetDocumentPriceRequest, GetDocumentDeliveryDateRequest,
-    SaveInternetDocumentRequest, GetDocumentListRequest,
+    DocumentPriceRequest, DocumentDeliveryDateRequest,
+    SaveInternetDocumentRequest, DocumentListRequest,
     DeleteInternetDocumentRequest, UpdateInternetDocumentRequest
 )
-from nova_post.models.counterparty import GetCounterpartiesResponse
+from nova_post.models.counterparty import GetCounterpartiesResponse, GetCounterpartiesRequest, \
+    CounterpartyAddressRequest
 
 load_dotenv()
 
@@ -31,7 +33,7 @@ def get_valid_counterparty(api, counterparty_property="Sender"):
 
 def test_get_document_price(api):
     try:
-        request = GetDocumentPriceRequest(
+        request = DocumentPriceRequest(
             CitySender="db5c8892-391c-11dd-90d9-001a92567626",
             CityRecipient="8d5a980d-391c-11dd-90d9-001a92567626",
             Weight=1.2,
@@ -52,7 +54,7 @@ def test_get_document_price(api):
 
 def test_get_document_delivery_date(api):
     try:
-        request = GetDocumentDeliveryDateRequest(
+        request = DocumentDeliveryDateRequest(
             ServiceType="WarehouseWarehouse",
             CitySender="db5c8892-391c-11dd-90d9-001a92567626",
             CityRecipient="8d5a980d-391c-11dd-90d9-001a92567626"
@@ -69,15 +71,15 @@ def test_get_document_delivery_date(api):
 def test_save_internet_document(api):
     try:
         # Отримуємо всіх контрагентів
-        sender_list = api.counterparty.get_counterparties("Sender")
-        recipient_list = api.counterparty.get_counterparties("Recipient")
+        sender_list = api.counterparty.get_counterparties(GetCounterpartiesRequest(CounterpartyProperty="Sender"))
+        recipient_list = api.counterparty.get_counterparties(GetCounterpartiesRequest(CounterpartyProperty="Recipient"))
 
         assert sender_list, "Не знайдено жодного відправника!"
         assert recipient_list, "Не знайдено жодного одержувача!"
 
         # Беремо першого контрагента
-        sender_ref = sender_list[0].Ref
-        recipient_ref = recipient_list[0].Ref
+        sender_ref = GetContactPersonRequest(Ref=sender_list[0].Ref)
+        recipient_ref = GetContactPersonRequest(Ref=recipient_list[0].Ref)
 
         print(f"Вибрано контрагента Sender: {sender_ref}")
         print(f"Вибрано контрагента Recipient: {recipient_ref}")
@@ -115,9 +117,11 @@ def test_save_internet_document(api):
         print(f"Вибрано контакт Sender: {contact_sender_ref}")
         print(f"Вибрано контакт Recipient: {contact_recipient_ref}")
 
+        sender = CounterpartyAddressRequest(Ref=sender_ref.Ref, CounterpartyProperty="Sender")
+        recipient = CounterpartyAddressRequest(Ref=recipient_ref.Ref, CounterpartyProperty="Recipient")
         # Отримуємо адреси контрагентів
-        sender_addresses = api.counterparty.get_counterparty_addresses(sender_ref, "Sender")
-        recipient_addresses = api.counterparty.get_counterparty_addresses(recipient_ref, "Recipient")
+        sender_addresses = api.counterparty.get_counterparty_addresses(sender)
+        recipient_addresses = api.counterparty.get_counterparty_addresses(recipient)
 
         sender_address_ref = sender_addresses[0].Ref if sender_addresses else None
         recipient_address_ref = recipient_addresses[0].Ref if recipient_addresses else None
@@ -137,12 +141,12 @@ def test_save_internet_document(api):
             Description="Тестовый груз",
             Cost=500,
             CitySender="8d5a980d-391c-11dd-90d9-001a92567626",
-            Sender=sender_ref,
+            Sender=sender_ref.Ref,
             SenderAddress=sender_address_ref,
             ContactSender=contact_sender_ref,
             SendersPhone="380660000000",
             CityRecipient="8d5a980d-391c-11dd-90d9-001a92567626",
-            Recipient=recipient_ref,
+            Recipient=recipient_ref.Ref,
             RecipientAddress=sender_address_ref,
             ContactRecipient=contact_recipient_ref,
             RecipientsPhone="380661111111"
@@ -158,7 +162,7 @@ def test_save_internet_document(api):
 
 def test_get_document_list(api):
     try:
-        request = GetDocumentListRequest(
+        request = DocumentListRequest(
             DateTimeFrom="01.03.2025",
             DateTimeTo="31.03.2025"
         )
@@ -172,7 +176,7 @@ def test_get_document_list(api):
 def test_delete_internet_document(api):
     try:
         # Получаем список существующих накладных
-        request_list = GetDocumentListRequest(DateTimeFrom="01.03.2025", DateTimeTo="31.03.2025")
+        request_list = DocumentListRequest(DateTimeFrom="01.03.2025", DateTimeTo="31.03.2025")
         documents = api.internet_document.get_document_list(request_list)
         if not documents:
             pytest.skip("Нет доступных накладных для удаления")

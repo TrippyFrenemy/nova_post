@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from nova_post.api import NovaPostApi
-from nova_post.models.contact_person import ContactPersonRequest
+from nova_post.models.contact_person import ContactPersonRequest, DeleteContactPersonRequest
 from nova_post.models.counterparty import CounterpartyRequest
 
 
@@ -170,8 +170,12 @@ def test_create_and_delete_contact_person_mock(api):
     assert new_cp.FirstName == "Контакт"
     assert new_cp.LastName == "Тест"
 
+    delete_cp = DeleteContactPersonRequest(
+        Ref=new_cp.Ref
+    )
+
     # Удаляем контакт
-    deleted = api.counterparty.delete_contact_person(new_cp.Ref)
+    deleted = api.counterparty.delete_contact_person(delete_cp)
     assert deleted is True
 
     # Проверяем, что метод send_request был вызван два раза
