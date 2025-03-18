@@ -2,6 +2,8 @@ import requests
 import importlib
 from .exceptions import NovaPostApiError
 from .logger import logger
+from fake_useragent import UserAgent
+ua = UserAgent()
 
 
 class NovaPostApi:
@@ -14,6 +16,10 @@ class NovaPostApi:
         self._adapters_cache = {}
 
     def send_request(self, model: str, method: str, properties: dict, timeout: int = DEFAULT_TIMEOUT):
+        headers = {
+            "User-Agent": ua.random,
+        }
+
         payload = {
             "apiKey": self.api_key,
             "modelName": model,
@@ -24,7 +30,7 @@ class NovaPostApi:
         logger.info(f"Запрос: {payload}")
 
         try:
-            response = self.session.post(self.API_URL, json=payload, timeout=timeout)
+            response = self.session.post(self.API_URL, json=payload, timeout=timeout, headers=headers)
             result = response.json()
         except requests.Timeout:
             logger.error(f"Ошибка: запрос к {model}/{method} превысил {timeout} секунд")

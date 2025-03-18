@@ -10,7 +10,8 @@ from nova_post.models.address import (
     AddressUpdateRequest, AddressSaveRequest, AddressDeleteRequest,
     GetCitiesRequest, GetWarehousesRequest, GetStreetsRequest
 )
-
+from nova_post.models.contact_person import GetContactPersonRequest
+from nova_post.models.counterparty import GetCounterpartiesRequest
 
 load_dotenv()
 
@@ -61,17 +62,19 @@ def test_create_update_delete_address(api):
     found_counterparty_ref = None
 
     try:
-        all_counterparties = api.counterparty.get_counterparties(
-            counterparty_property="Recipient",
-            find_by_string="Приватна"  # ищем по строке "Тестов", чтобы быстрее сузить выборку
+        counter_party = GetCounterpartiesRequest(
+            CounterpartyProperty="Recipient",
+            FindByString="Приватна"
         )
+        all_counterparties = api.counterparty.get_counterparties(counter_party)
     except NovaPostApiError as exc:
         pytest.fail(f"Ошибка при запросе контрагентов: {exc}")
 
     found_counterparty_ref = None
     for cparty in all_counterparties:
         # Загружаем контакты для данного контрагента
-        contact_persons = api.counterparty.get_counterparty_contact_persons(cparty.Ref)
+        cparty_ref = GetContactPersonRequest(Ref=cparty.Ref)
+        contact_persons = api.counterparty.get_counterparty_contact_persons(cparty_ref)
         for cp in contact_persons:
             if cp.FirstName and target_name in cp.FirstName:
                 found_counterparty_ref = cparty.Ref

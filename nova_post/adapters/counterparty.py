@@ -2,20 +2,22 @@ from typing import List, Optional
 
 from ..models.contact_person import (
     ContactPersonRequest,
-    ContactPersonResponse
+    ContactPersonResponse, DeleteContactPersonRequest, GetContactPersonRequest
 )
 from ..models.counterparty import (
     CounterpartyRequest,
     CounterpartyResponse,
-    CounterpartyOptions,
-    CounterpartyAddress,
-    GetCounterpartiesResponse,
+    GetCounterpartiesResponse, GetCounterpartiesRequest, DeleteCounterpartiesRequest, CounterpartyAddressResponse,
+    CounterpartyAddressRequest, CounterpartyOptionsResponse, CounterpartyOptionsRequest,
 )
 
 
 class Counterparty:
     """
-    Адаптер для работы с контрагентами и (по желанию) их контактными лицами.
+    Адаптер для роботи з контрагентами та їх контактними особами.
+
+    Дозволяє створювати, оновлювати, видаляти контрагентів, отримувати список контрагентів,
+    їх контактних осіб та адреси.
     """
 
     def __init__(self, api):
@@ -23,127 +25,101 @@ class Counterparty:
 
     def save(self, data: CounterpartyRequest) -> CounterpartyResponse:
         """
-        Создание контрагента (PrivatePerson, ThirdPerson, Organization).
-        В зависимости от заполненных полей:
-         - FirstName, LastName, MiddleName => физ. лицо
-         - EDRPOU => организация
-         - И т.д.
-        Документация: метод «save» для модели «Counterparty».
-        """
-        # Формируем словарь properties на основе pydantic-модели
-        properties = data.model_dump(exclude_unset=True)
-        result = self.api.send_request("Counterparty", "save", properties)
-        if not result:
-            return CounterpartyResponse()  # Пустое значение, если нет ответа
-        return CounterpartyResponse.model_validate(result[0])
+        Створення контрагента (Фізична особа, Третя особа, Організація).
 
-    def get_counterparties(
-            self,
-            counterparty_property: str,
-            page: Optional[int] = None,
-            find_by_string: Optional[str] = None
-    ) -> List[GetCounterpartiesResponse]:
+        :param data: Pydantic-модель `CounterpartyRequest`, що містить інформацію про контрагента.
+        :return: Об'єкт `CounterpartyResponse` із даними створеного контрагента.
         """
-        Получить список контрагентов (получателей, отправителей, третьих лиц).
-        Документация: метод «getCounterparties».
-        """
-        properties = {
-            "CounterpartyProperty": counterparty_property
-        }
-        if page:
-            properties["Page"] = page
-        if find_by_string:
-            properties["FindByString"] = find_by_string
+        result = self.api.send_request("Counterparty", "save", data.model_dump(exclude_unset=True))
+        return CounterpartyResponse.model_validate(result[0]) if result else CounterpartyResponse()
 
-        result = self.api.send_request("Counterparty", "getCounterparties", properties)
+    def get_counterparties(self, data: GetCounterpartiesRequest) -> List[GetCounterpartiesResponse]:
+        """
+        Отримання списку контрагентів (відправників, отримувачів, третіх осіб).
+
+        :param data: Pydantic-модель `GetCounterpartiesRequest` із параметрами пошуку.
+        :return: Список об'єктів `GetCounterpartiesResponse` із даними контрагентів.
+        """
+        result = self.api.send_request("Counterparty", "getCounterparties", data.model_dump(exclude_unset=True))
         return [GetCounterpartiesResponse.model_validate(cp) for cp in result]
 
     def update(self, data: CounterpartyRequest) -> CounterpartyResponse:
         """
-        Обновление данных контрагента.
-        Документация: метод «update» для модели «Counterparty».
-        """
-        properties = data.model_dump(exclude_unset=True)
-        result = self.api.send_request("Counterparty", "update", properties)
-        if not result:
-            return CounterpartyResponse()
-        return CounterpartyResponse.model_validate(result[0])
+        Оновлення даних контрагента.
 
-    def delete(self, ref: str) -> bool:
+        :param data: Pydantic-модель `CounterpartyRequest` із новими даними контрагента.
+        :return: Об'єкт `CounterpartyResponse` із оновленими даними контрагента.
         """
-        Удалить контрагента-одержувача.
-        Документация: метод «delete» для модели «Counterparty».
+        result = self.api.send_request("Counterparty", "update", data.model_dump(exclude_unset=True))
+        return CounterpartyResponse.model_validate(result[0]) if result else CounterpartyResponse()
+
+    def delete(self, data: DeleteCounterpartiesRequest) -> bool:
         """
-        properties = {"Ref": ref}
-        result = self.api.send_request("Counterparty", "delete", properties)
+        Видалення контрагента.
+
+        :param data: Pydantic-модель `DeleteCounterpartiesRequest` із `Ref` контрагента.
+        :return: `True`, якщо видалення успішне.
+        """
+        result = self.api.send_request("Counterparty", "delete", data.model_dump(exclude_unset=True))
         return bool(result)
 
-    def get_counterparty_addresses(self, ref: str, counterparty_property: str) -> List[CounterpartyAddress]:
+    def get_counterparty_addresses(self, data: CounterpartyAddressRequest) -> List[CounterpartyAddressResponse]:
         """
-        Загрузка списка адресов контрагента.
-        Документация: метод «getCounterpartyAddresses».
-        """
-        properties = {
-            "Ref": ref,
-            "CounterpartyProperty": counterparty_property
-        }
-        result = self.api.send_request("Counterparty", "getCounterpartyAddresses", properties)
-        return [CounterpartyAddress.model_validate(addr) for addr in result]
+        Отримання списку адрес контрагента.
 
-    def get_counterparty_options(self, ref: str) -> Optional[CounterpartyOptions]:
+        :param data: Pydantic-модель `CounterpartyAddressRequest`, що містить `Ref` контрагента.
+        :return: Список об'єктів `CounterpartyAddressResponse` із адресами контрагента.
         """
-        Получить параметры контрагента.
-        Документация: метод «getCounterpartyOptions».
-        """
-        properties = {"Ref": ref}
-        result = self.api.send_request("Counterparty", "getCounterpartyOptions", properties)
-        if not result:
-            return None
-        # Предполагаем, что result[0] содержит данные об опциях
-        return CounterpartyOptions.model_validate(result[0])
+        result = self.api.send_request("Counterparty", "getCounterpartyAddresses", data.model_dump(exclude_unset=True))
+        return [CounterpartyAddressResponse.model_validate(addr) for addr in result]
 
-    def get_counterparty_contact_persons(
-            self,
-            ref: str,
-            page: Optional[int] = None
-    ) -> List[ContactPersonResponse]:
+    def get_counterparty_options(self, data: CounterpartyOptionsRequest) -> Optional[CounterpartyOptionsResponse]:
         """
-        Получить список контактных лиц контрагента.
-        Документация: «getCounterpartyContactPersons» (модель «Counterparty»).
+        Отримання параметрів контрагента.
+
+        :param data: Pydantic-модель `CounterpartyOptionsRequest`, що містить `Ref` контрагента.
+        :return: Об'єкт `CounterpartyOptionsResponse` із можливостями контрагента або `None`, якщо дані відсутні.
         """
-        properties = {"Ref": ref}
-        if page:
-            properties["Page"] = page
-        result = self.api.send_request("Counterparty", "getCounterpartyContactPersons", properties)
+        result = self.api.send_request("Counterparty", "getCounterpartyOptions", data.model_dump(exclude_unset=True))
+        return CounterpartyOptionsResponse.model_validate(result[0]) if result else None
+
+    def get_counterparty_contact_persons(self, data: GetContactPersonRequest) -> List[ContactPersonResponse]:
+        """
+        Отримання списку контактних осіб контрагента.
+
+        :param data: Pydantic-модель `GetContactPersonRequest`, що містить `Ref` контрагента та `Page`.
+        :return: Список об'єктів `ContactPersonResponse` із контактними особами контрагента.
+        """
+        result = self.api.send_request("Counterparty", "getCounterpartyContactPersons",
+                                       data.model_dump(exclude_unset=True))
         return [ContactPersonResponse.model_validate(item) for item in result]
 
     def save_contact_person(self, data: ContactPersonRequest) -> ContactPersonResponse:
         """
-        Создать контактное лицо контрагента.
-        Документация: метод «save» (модель «ContactPerson»).
+        Створення контактної особи контрагента.
+
+        :param data: Pydantic-модель `ContactPersonRequest` із даними контактної особи.
+        :return: Об'єкт `ContactPersonResponse` із даними створеної контактної особи.
         """
-        properties = data.model_dump(exclude_unset=True)
-        result = self.api.send_request("ContactPerson", "save", properties)
-        if not result:
-            return ContactPersonResponse(Ref="", Description="")
-        return ContactPersonResponse.model_validate(result[0])
+        result = self.api.send_request("ContactPerson", "save", data.model_dump(exclude_unset=True))
+        return ContactPersonResponse.model_validate(result[0]) if result else ContactPersonResponse()
 
     def update_contact_person(self, data: ContactPersonRequest) -> ContactPersonResponse:
         """
-        Обновить контактное лицо контрагента.
-        Документация: метод «update» (модель «ContactPerson»).
-        """
-        properties = data.model_dump(exclude_unset=True)
-        result = self.api.send_request("ContactPerson", "update", properties)
-        if not result:
-            return ContactPersonResponse(Ref="", Description="")
-        return ContactPersonResponse.model_validate(result[0])
+        Оновлення контактної особи контрагента.
 
-    def delete_contact_person(self, ref: str) -> bool:
+        :param data: Pydantic-модель `ContactPersonRequest`, що містить нові дані контактної особи.
+        :return: Об'єкт `ContactPersonResponse` із оновленими даними контактної особи.
         """
-        Удалить контактное лицо контрагента.
-        Документация: метод «delete» (модель «ContactPerson»).
+        result = self.api.send_request("ContactPerson", "update", data.model_dump(exclude_unset=True))
+        return ContactPersonResponse.model_validate(result[0]) if result else ContactPersonResponse()
+
+    def delete_contact_person(self, data: DeleteContactPersonRequest) -> bool:
         """
-        properties = {"Ref": ref}
-        result = self.api.send_request("ContactPerson", "delete", properties)
+        Видалення контактної особи контрагента.
+
+        :param data: Pydantic-модель `DeleteContactPersonRequest`, що містить `Ref` контактної особи.
+        :return: `True`, якщо контактна особа успішно видалена.
+        """
+        result = self.api.send_request("ContactPerson", "delete", data.model_dump(exclude_unset=True))
         return bool(result)

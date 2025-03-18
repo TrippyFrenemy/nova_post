@@ -3,8 +3,8 @@ from unittest.mock import Mock, patch
 
 from nova_post.api import NovaPostApi
 from nova_post.models.internet_document import (
-    GetDocumentPriceRequest, GetDocumentDeliveryDateRequest,
-    SaveInternetDocumentRequest, GetDocumentListRequest,
+    DocumentPriceRequest, DocumentDeliveryDateRequest,
+    SaveInternetDocumentRequest, DocumentListRequest,
     DeleteInternetDocumentRequest, UpdateInternetDocumentRequest
 )
 
@@ -24,7 +24,7 @@ def test_get_document_price(mock_api):
     mock_api.internet_document.get_document_price.return_value = mock_response
 
     # Execute test
-    request = GetDocumentPriceRequest(
+    request = DocumentPriceRequest(
         CitySender="db5c8892-391c-11dd-90d9-001a92567626",
         CityRecipient="8d5a980d-391c-11dd-90d9-001a92567626",
         Weight=1.2,
@@ -47,7 +47,7 @@ def test_get_document_delivery_date(mock_api):
     mock_api.internet_document.get_document_delivery_date.return_value = mock_response
 
     # Execute test
-    request = GetDocumentDeliveryDateRequest(
+    request = DocumentDeliveryDateRequest(
         ServiceType="WarehouseWarehouse",
         CitySender="db5c8892-391c-11dd-90d9-001a92567626",
         CityRecipient="8d5a980d-391c-11dd-90d9-001a92567626"
@@ -98,7 +98,7 @@ def test_get_document_list(mock_api):
     mock_api.internet_document.get_document_list.return_value = mock_documents
 
     # Execute test
-    request = GetDocumentListRequest(
+    request = DocumentListRequest(
         DateTimeFrom="01.03.2025",
         DateTimeTo="31.03.2025"
     )

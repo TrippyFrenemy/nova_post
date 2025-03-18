@@ -4,7 +4,15 @@ from pydantic import BaseModel
 
 
 class City(BaseModel):
-    """Модель города"""
+    """
+    Модель міста.
+
+    Атрибути:
+    - `Ref` (str): Ідентифікатор міста.
+    - `Description` (str): Назва міста українською мовою.
+    - `DescriptionRu` (Optional[str]): Назва міста російською мовою (необов'язковий).
+    - `Area` (Optional[str]): Ідентифікатор області (необов'язковий).
+    """
     Ref: str
     Description: str
     DescriptionRu: Optional[str] = None
@@ -12,7 +20,17 @@ class City(BaseModel):
 
 
 class Warehouse(BaseModel):
-    """Модель отделения"""
+    """
+    Модель відділення.
+
+    Атрибути:
+    - `SiteKey` (int): Унікальний ключ відділення.
+    - `Description` (str): Назва відділення українською мовою.
+    - `DescriptionRu` (Optional[str]): Назва відділення російською мовою (необов'язковий).
+    - `Number` (str): Номер відділення.
+    - `CityRef` (str): Ідентифікатор міста, в якому знаходиться відділення.
+    - `TypeOfWarehouse` (Optional[str]): Тип відділення (необов'язковий).
+    """
     SiteKey: int
     Description: str
     DescriptionRu: Optional[str] = None
@@ -22,7 +40,15 @@ class Warehouse(BaseModel):
 
 
 class Street(BaseModel):
-    """Модель улицы"""
+    """
+    Модель вулиці.
+
+    Атрибути:
+    - `Ref` (str): Ідентифікатор вулиці.
+    - `Description` (str): Назва вулиці.
+    - `StreetsTypeRef` (str): Ідентифікатор типу вулиці.
+    - `StreetsType` (str): Опис типу вулиці.
+    """
     Ref: str
     Description: str
     StreetsTypeRef: str
@@ -30,14 +56,30 @@ class Street(BaseModel):
 
 
 class Area(BaseModel):
-    """Модель области"""
+    """
+    Модель області.
+
+    Атрибути:
+    - `Ref` (str): Ідентифікатор області.
+    - `Description` (str): Назва області українською мовою.
+    - `DescriptionRu` (Optional[str]): Назва області російською мовою (необов'язковий).
+    """
     Ref: str
     Description: str
     DescriptionRu: Optional[str] = None
 
 
 class Settlement(BaseModel):
-    """Модель населённого пункта"""
+    """
+    Модель населеного пункту.
+
+    Атрибути:
+    - `Ref` (str): Ідентифікатор населеного пункту.
+    - `Description` (str): Назва населеного пункту українською мовою.
+    - `DescriptionRu` (Optional[str]): Назва населеного пункту російською мовою (необов'язковий).
+    - `AreaRef` (str): Ідентифікатор області, до якої належить населений пункт.
+    - `Type` (str): Тип населеного пункту.
+    """
     Ref: str
     Description: str
     DescriptionRu: Optional[str] = None
@@ -46,7 +88,16 @@ class Settlement(BaseModel):
 
 
 class AddressSaveRequest(BaseModel):
-    """Модель для создания адреса."""
+    """
+    Модель для створення адреси.
+
+    Атрибути:
+    - `CounterpartyRef` (str): Ідентифікатор контрагента.
+    - `StreetRef` (str): Ідентифікатор вулиці.
+    - `BuildingNumber` (str): Номер будинку.
+    - `Flat` (Optional[str]): Номер квартири (необов'язковий).
+    - `Note` (Optional[str]): Додаткові примітки (необов'язковий).
+    """
     CounterpartyRef: str
     StreetRef: str
     BuildingNumber: str
@@ -55,7 +106,17 @@ class AddressSaveRequest(BaseModel):
 
 
 class AddressUpdateRequest(BaseModel):
-    """Модель для обновления адреса."""
+    """
+    Модель для оновлення адреси.
+
+    Атрибути:
+    - `Ref` (str): Ідентифікатор адреси.
+    - `CounterpartyRef` (Optional[str]): Ідентифікатор контрагента (необов'язковий).
+    - `StreetRef` (Optional[str]): Ідентифікатор вулиці (необов'язковий).
+    - `BuildingNumber` (Optional[str]): Номер будинку (необов'язковий).
+    - `Flat` (Optional[str]): Номер квартири (необов'язковий).
+    - `Note` (Optional[str]): Додаткові примітки (необов'язковий).
+    """
     Ref: str
     CounterpartyRef: Optional[str] = None
     StreetRef: Optional[str] = None
@@ -65,18 +126,38 @@ class AddressUpdateRequest(BaseModel):
 
 
 class AddressDeleteRequest(BaseModel):
-    """Модель для удаления адреса."""
+    """
+    Модель для видалення адреси.
+
+    Атрибути:
+    - `Ref` (str): Ідентифікатор адреси.
+    """
     Ref: str
 
 
 class AddressResponse(BaseModel):
-    """Ответ при создании / обновлении / удалении адреса."""
+    """
+    Відповідь при створенні, оновленні або видаленні адреси.
+
+    Атрибути:
+    - `Ref` (str): Ідентифікатор адреси.
+    - `Description` (Optional[str]): Опис адреси (необов'язковий).
+    """
     Ref: str
     Description: Optional[str] = None
 
 
 class GetCitiesRequest(BaseModel):
-    """Модель запроса списка городов."""
+    """
+    Модель запиту на отримання списку міст.
+
+    Атрибути:
+    - `FindByString` (Optional[str]): Пошук міста за назвою (необов'язковий).
+    - `Ref` (Optional[str]): Ідентифікатор міста (необов'язковий).
+    - `Limit` (Optional[int]): Ліміт результатів (необов'язковий).
+    - `Page` (Optional[int]): Номер сторінки (необов'язковий).
+    - `Warehouse` (Optional[str]): Фільтр за наявністю відділень (необов'язковий).
+    """
     FindByString: Optional[str] = None
     Ref: Optional[str] = None
     Limit: Optional[int] = None
@@ -85,7 +166,16 @@ class GetCitiesRequest(BaseModel):
 
 
 class GetWarehousesRequest(BaseModel):
-    """Модель запроса списка отделений."""
+    """
+    Модель запиту на отримання списку відділень.
+
+    Атрибути:
+    - `CityRef` (Optional[str]): Ідентифікатор міста (необов'язковий).
+    - `WarehouseRef` (Optional[str]): Ідентифікатор відділення (необов'язковий).
+    - `Limit` (Optional[int]): Ліміт результатів (необов'язковий).
+    - `Page` (Optional[int]): Номер сторінки (необов'язковий).
+    - `FindByString` (Optional[str]): Пошук відділення за назвою (необов'язковий).
+    """
     CityRef: Optional[str] = None
     WarehouseRef: Optional[str] = None
     Limit: Optional[int] = None
@@ -94,7 +184,16 @@ class GetWarehousesRequest(BaseModel):
 
 
 class GetStreetsRequest(BaseModel):
-    """Модель запроса списка улиц."""
+    """
+    Модель запиту на отримання списку вулиць.
+
+    Атрибути:
+    - `CityRef` (str): Ідентифікатор міста.
+    - `FindByString` (Optional[str]): Пошук вулиці за назвою (необов'язковий).
+    - `Ref` (Optional[str]): Ідентифікатор вулиці (необов'язковий).
+    - `Limit` (Optional[int]): Ліміт результатів (необов'язковий).
+    - `Page` (Optional[int]): Номер сторінки (необов'язковий).
+    """
     CityRef: str
     FindByString: Optional[str] = None
     Ref: Optional[str] = None
@@ -103,14 +202,33 @@ class GetStreetsRequest(BaseModel):
 
 
 class SearchSettlementsRequest(BaseModel):
-    """Запрос на поиск населённых пунктов."""
+    """
+    Запит на пошук населених пунктів.
+
+    Атрибути:
+    - `CityName` (str): Назва населеного пункту.
+    - `Limit` (int): Кількість записів на сторінці (за замовчуванням 50).
+    - `Page` (int): Номер сторінки (за замовчуванням 1).
+    """
     CityName: str
     Limit: int = 50
     Page: int = 1
 
 
 class SearchSettlementsItem(BaseModel):
-    """Элемент результата поиска населённых пунктов."""
+    """
+    Елемент результату пошуку населених пунктів.
+
+    Атрибути:
+    - `Present` (str): Повна назва населеного пункту.
+    - `Warehouses` (str): Кількість відділень у населеному пункті.
+    - `MainDescription` (str): Основний опис населеного пункту.
+    - `Area` (str): Область, до якої належить населений пункт.
+    - `Region` (str): Район населеного пункту.
+    - `SettlementTypeCode` (str): Код типу населеного пункту.
+    - `Ref` (str): Ідентифікатор населеного пункту.
+    - `DeliveryCity` (str): Ідентифікатор міста доставки.
+    """
     Present: str
     Warehouses: str
     MainDescription: str
@@ -122,20 +240,43 @@ class SearchSettlementsItem(BaseModel):
 
 
 class SearchSettlementsResponse(BaseModel):
-    """Ответ на поиск населённых пунктов."""
+    """
+    Відповідь на пошук населених пунктів.
+
+    Атрибути:
+    - `TotalCount` (Optional[str]): Загальна кількість знайдених об'єктів.
+    - `Addresses` (List[SearchSettlementsItem]): Список знайдених населених пунктів.
+    """
     TotalCount: Optional[str] = None
     Addresses: List[SearchSettlementsItem] = []
 
 
 class SearchSettlementStreetsRequest(BaseModel):
-    """Запрос на поиск улиц в населенном пункте."""
+    """
+    Запит на пошук вулиць у населеному пункті.
+
+    Атрибути:
+    - `SettlementRef` (str): Ідентифікатор населеного пункту.
+    - `StreetName` (str): Назва вулиці.
+    - `Limit` (int): Кількість записів (за замовчуванням 50).
+    """
     SettlementRef: str
     StreetName: str
     Limit: int = 50
 
 
 class SearchSettlementStreetsItem(BaseModel):
-    """Элемент результата поиска улиц."""
+    """
+    Елемент результату пошуку вулиць.
+
+    Атрибути:
+    - `SettlementRef` (str): Ідентифікатор населеного пункту.
+    - `SettlementStreetRef` (str): Ідентифікатор вулиці.
+    - `SettlementStreetDescription` (str): Назва вулиці.
+    - `Present` (str): Повна назва вулиці, що включає тип вулиці та її назву.
+    - `StreetsType` (str): Ідентифікатор типу вулиці (наприклад, вулиця, проспект тощо).
+    - `StreetsTypeDescription` (str): Опис типу вулиці.
+    """
     SettlementRef: str
     SettlementStreetRef: str
     SettlementStreetDescription: str
@@ -145,6 +286,12 @@ class SearchSettlementStreetsItem(BaseModel):
 
 
 class SearchSettlementStreetsResponse(BaseModel):
-    """Ответ на поиск улиц в населенном пункте."""
+    """
+    Відповідь на пошук вулиць у населеному пункті.
+
+    Атрибути:
+    - `TotalCount` (Optional[str]): Загальна кількість знайдених об'єктів.
+    - `Addresses` (List[SearchSettlementStreetsItem]): Список знайдених вулиць.
+    """
     TotalCount: Optional[str] = None
     Addresses: List[SearchSettlementStreetsItem] = []
