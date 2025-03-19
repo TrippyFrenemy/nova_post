@@ -52,20 +52,25 @@ jobs:
         with:
           token: ${{ secrets.GH_PAT }}
 
+      - name: Install GitHub CLI
+        run: |
+          sudo apt update
+          sudo apt install gh -y
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools wheel twine gh
+          pip install setuptools wheel twine build
 
       - name: Extract current version
         id: version
         run: |
-          set -e  # Остановить скрипт при ошибке
+          set -e
           VERSION_FILE="nova_post/__init__.py"
           CURRENT_VERSION=$(grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' $VERSION_FILE)
           MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
@@ -102,7 +107,7 @@ jobs:
         id: create_pr
         run: |
           set -e
-          PR_URL=$(gh pr create --title "Bump version to $NEW_VERSION" --body "Automated version bump to $NEW_VERSION" --base main --head $BRANCH_NAME)
+          PR_URL=$(gh pr create --title "Bump version to $NEW_VERSION" --body "Automated version bump to $NEW_VERSION" --base main --head $BRANCH_NAME --repo ${{ github.repository }})
           echo "PR_URL=$PR_URL" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
