@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="nova-post",
-    version="0.2.0",
+    version="0.2.1",
     author="Dmytro Avrushchenko",
     author_email="trippyfren@gmail.com",
     description="Python SDK for working with the Nova Post API",
