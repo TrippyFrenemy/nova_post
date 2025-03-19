@@ -1,6 +1,7 @@
-from typing import List, Optional
+from datetime import datetime
+from typing import List, Optional, Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class DocumentPriceRequest(BaseModel):
@@ -27,7 +28,7 @@ class DocumentPriceRequest(BaseModel):
     Weight: float
     ServiceType: str
     Cost: Optional[int] = 300
-    CargoType: str
+    CargoType: Literal["Cargo", "Documents", "TiresWheels", "Pallet"]
     SeatsAmount: int
     RedeliveryCalculate: Optional[dict] = None
     PackCount: Optional[int] = None
@@ -108,12 +109,12 @@ class SaveInternetDocumentRequest(BaseModel):
     - `OptionsSeat` (Optional[List[dict]]): Параметри кожного місця (необов’язково).
     - `BackwardDeliveryData` (Optional[List[dict]]): Інформація про зворотну доставку (необов’язково).
     """
-    PayerType: str
-    PaymentMethod: str
+    PayerType: Literal["Sender", "Recipient", "ThirdPerson"]
+    PaymentMethod: Literal["Cash", "NonCash"]
     DateTime: str
     CargoType: str
     Weight: float
-    ServiceType: str
+    ServiceType: Literal["DoorsDoors", "DoorsWarehouse", "WarehouseWarehouse", "WarehouseDoors"]
     SeatsAmount: int
     Description: str
     Cost: int
@@ -129,6 +130,17 @@ class SaveInternetDocumentRequest(BaseModel):
     RecipientsPhone: str
     OptionsSeat: Optional[List[dict]] = None
     BackwardDeliveryData: Optional[List[dict]] = None
+
+    @field_validator("DateTime", mode="before")
+    def set_default_date(cls, value):
+        today = datetime.now().strftime("%d.%m.%Y")
+        if not value:
+            return today
+        try:
+            input_date = datetime.strptime(value, "%d.%m.%Y").strftime("%d.%m.%Y")
+            return max(input_date, today)
+        except ValueError:
+            return today
 
 
 class SaveInternetDocumentResponse(BaseModel):
@@ -300,12 +312,12 @@ class UpdateInternetDocumentRequest(BaseModel):
     - `Cost` (int): Оціночна вартість.
     """
     Ref: str
-    PayerType: str
-    PaymentMethod: str
+    PayerType: Literal["Sender", "Recipient", "ThirdPerson"]
+    PaymentMethod: Literal["Cash", "NonCash"]
     DateTime: str
     CargoType: str
     Weight: float
-    ServiceType: str
+    ServiceType: Literal["DoorsDoors", "DoorsWarehouse", "WarehouseWarehouse", "WarehouseDoors"]
     SeatsAmount: int
     Description: str
     Cost: int
