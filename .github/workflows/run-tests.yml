@@ -93,6 +93,15 @@ jobs:
           set -e
           VERSION_FILE="setup.py"
           sed -i "s/version=\"$CURRENT_VERSION\"/version=\"$NEW_VERSION\"/" $VERSION_FILE
+        
+      - name: Build and publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          set -e
+          python -m build
+          twine upload dist/*
 
       - name: Commit and push new branch
         run: |
