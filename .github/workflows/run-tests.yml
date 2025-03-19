@@ -71,8 +71,8 @@ jobs:
         id: version
         run: |
           set -e
-          VERSION_FILE="nova_post/__init__.py"
-          CURRENT_VERSION=$(grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' $VERSION_FILE)
+          VERSION_FILE="setup.py"
+          CURRENT_VERSION=$(grep -Po '(?<=version=")[0-9]+\.[0-9]+\.[0-9]+' $VERSION_FILE)
           MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
           MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
           PATCH=$(echo $CURRENT_VERSION | cut -d. -f3)
@@ -88,18 +88,18 @@ jobs:
           git checkout -b $BRANCH_NAME
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
 
-      - name: Update version in __init__.py
+      - name: Update version in setup.py
         run: |
           set -e
-          VERSION_FILE="nova_post/__init__.py"
-          sed -i "s/__version__ = \"$CURRENT_VERSION\"/__version__ = \"$NEW_VERSION\"/" $VERSION_FILE
+          VERSION_FILE="setup.py"
+          sed -i "s/version=\"$CURRENT_VERSION\"/version=\"$NEW_VERSION\"/" $VERSION_FILE
 
       - name: Commit and push new branch
         run: |
           set -e
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add nova_post/__init__.py
+          git add setup.py
           git commit -m "Bump version to $NEW_VERSION"
           git push origin $BRANCH_NAME || (echo "Push failed" && exit 1)
 
@@ -112,19 +112,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
 
-      - name: Build package
-        run: |
-          set -e
-          python -m build
-
-      - name: Publish to PyPI
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        run: |
-          set -e
-          twine upload dist/*
-
   rollback:
     needs: release
     if: failure()
@@ -132,9 +119,9 @@ jobs:
     steps:
       - name: Delete branch and close PR
         run: |
-          set +e  # Разрешить ошибки (чтобы не падало, если PR не создался)
+          set +e
           echo "Rolling back release..."
-          gh pr close ${{ env.PR_URL }} --delete-branch || echo "No PR to delete"
+          gh pr close ${{ env.PR_URL }} --repo ${{ github.repository }} --delete-branch || echo "No PR to delete"
           git push origin --delete ${{ env.BRANCH_NAME }} || echo "No branch to delete"
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
