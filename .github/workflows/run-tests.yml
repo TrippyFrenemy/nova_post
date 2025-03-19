@@ -108,7 +108,22 @@ jobs:
         run: |
           set -e
           PR_URL=$(gh pr create --title "Bump version to $NEW_VERSION" --body "Automated version bump to $NEW_VERSION" --base main --head $BRANCH_NAME --repo ${{ github.repository }})
+          PR_NUMBER=$(echo "$PR_URL" | grep -oE '[0-9]+$')
           echo "PR_URL=$PR_URL" >> $GITHUB_ENV
+          echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+
+  cleanup:
+    needs: release
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete branch after merge
+        run: |
+          set -e
+          echo "Deleting branch ${{ env.BRANCH_NAME }}..."
+          git push origin --delete ${{ env.BRANCH_NAME }} || echo "Branch already deleted"
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
 
@@ -117,11 +132,13 @@ jobs:
     if: failure()
     runs-on: ubuntu-latest
     steps:
-      - name: Delete branch and close PR
+      - name: Close PR and delete branch
         run: |
           set +e
           echo "Rolling back release..."
-          gh pr close ${{ env.PR_URL }} --repo ${{ github.repository }} --delete-branch || echo "No PR to delete"
+          if [ -n "${{ env.PR_NUMBER }}" ]; then
+            gh pr close ${{ env.PR_NUMBER }} --repo ${{ github.repository }} --delete-branch
+          fi
           git push origin --delete ${{ env.BRANCH_NAME }} || echo "No branch to delete"
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
