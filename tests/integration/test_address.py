@@ -146,4 +146,3 @@ def test_create_update_delete_address(api):
         logger.info(f"[TEST] Адрес удалён => Ref={address_ref}")
     except NovaPostApiError as exc:
         pytest.fail(f"Ошибка при удалении адреса: {exc}")
-

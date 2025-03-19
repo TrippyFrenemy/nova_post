@@ -1,11 +1,12 @@
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, patch
 
 from nova_post.api import NovaPostApi
 from nova_post.models.internet_document import (
     DocumentPriceRequest, DocumentDeliveryDateRequest,
     SaveInternetDocumentRequest, DocumentListRequest,
-    DeleteInternetDocumentRequest, UpdateInternetDocumentRequest
+    DeleteInternetDocumentRequest
 )
 
 

@@ -1,4 +1,5 @@
 import os
+
 import pytest
 from dotenv import load_dotenv
 
@@ -6,13 +7,13 @@ from nova_post.api import NovaPostApi
 from nova_post.exceptions import NovaPostApiError
 from nova_post.logger import logger
 from nova_post.models.contact_person import GetContactPersonRequest
+from nova_post.models.counterparty import GetCounterpartiesRequest, \
+    CounterpartyAddressRequest
 from nova_post.models.internet_document import (
     DocumentPriceRequest, DocumentDeliveryDateRequest,
     SaveInternetDocumentRequest, DocumentListRequest,
-    DeleteInternetDocumentRequest, UpdateInternetDocumentRequest
+    DeleteInternetDocumentRequest
 )
-from nova_post.models.counterparty import GetCounterpartiesResponse, GetCounterpartiesRequest, \
-    CounterpartyAddressRequest
 
 load_dotenv()
 
