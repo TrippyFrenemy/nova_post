@@ -55,16 +55,17 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools wheel twine
+          pip install setuptools wheel twine gh
 
       - name: Extract current version
         id: version
         run: |
+          set -e  # Остановить скрипт при ошибке
           VERSION_FILE="nova_post/__init__.py"
           CURRENT_VERSION=$(grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' $VERSION_FILE)
           MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
@@ -75,23 +76,60 @@ jobs:
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
           echo "New version: $NEW_VERSION"
 
+      - name: Create new branch
+        run: |
+          set -e
+          BRANCH_NAME="bump-version-$NEW_VERSION"
+          git checkout -b $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
       - name: Update version in __init__.py
         run: |
+          set -e
           VERSION_FILE="nova_post/__init__.py"
           sed -i "s/__version__ = \"$CURRENT_VERSION\"/__version__ = \"$NEW_VERSION\"/" $VERSION_FILE
 
-      - name: Commit and push new version
+      - name: Commit and push new branch
         run: |
+          set -e
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git add nova_post/__init__.py
           git commit -m "Bump version to $NEW_VERSION"
-          git push origin main
+          git push origin $BRANCH_NAME || (echo "Push failed" && exit 1)
 
-      - name: Build and publish to PyPI
+      - name: Create Pull Request
+        id: create_pr
+        run: |
+          set -e
+          PR_URL=$(gh pr create --title "Bump version to $NEW_VERSION" --body "Automated version bump to $NEW_VERSION" --base main --head $BRANCH_NAME)
+          echo "PR_URL=$PR_URL" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+
+      - name: Build package
+        run: |
+          set -e
+          python -m build
+
+      - name: Publish to PyPI
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-          python -m build
+          set -e
           twine upload dist/*
+
+  rollback:
+    needs: release
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete branch and close PR
+        run: |
+          set +e  # Разрешить ошибки (чтобы не падало, если PR не создался)
+          echo "Rolling back release..."
+          gh pr close ${{ env.PR_URL }} --delete-branch || echo "No PR to delete"
+          git push origin --delete ${{ env.BRANCH_NAME }} || echo "No branch to delete"
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}

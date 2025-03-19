@@ -1,1 +1,5 @@
-__version__ = "0.2.3"
+__version__ = "0.2.0"
+__author__ = "Dmytro Avrushchenko"
+__email__ = "trippyfren@gmail.com"
+__license__ = "MIT"
+__copyright__ = f"Copyright (c) 2025, {__author__}"
