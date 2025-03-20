@@ -61,7 +61,7 @@ from nova_post.models.internet_document import SaveInternetDocumentRequest
 request = SaveInternetDocumentRequest(
     PayerType="Sender",
     PaymentMethod="Cash",
-    DateTime="2025-03-18",
+    DateTime="18.03.2025",
     CargoType="Cargo",
     Weight=5.0,
     ServiceType="WarehouseWarehouse",
