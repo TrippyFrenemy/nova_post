@@ -1,5 +1,8 @@
 # Nova\_Post
 
+- [![Tests](https://github.com/TrippyFrenemy/nova_post/actions/workflows/run-tests.yml/badge.svg)](https://github.com/TrippyFrenemy/nova_post/actions)  
+- [![PyPI version](https://badge.fury.io/py/nova-post.svg)](https://pypi.org/project/nova-post/)
+
 A Python wrapper for the Nova Poshta API, providing an easy-to-use interface for interacting with Nova Poshta's logistics and tracking services.
 
 ## Features
