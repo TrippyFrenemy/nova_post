@@ -7,11 +7,15 @@ on:
       - develop
     paths-ignore:
       - '**/*.md'
+      - '**/*.yml'
+      - '**/setup.py'
   pull_request:
     branches:
       - main
     paths-ignore:
       - '**/*.md'
+      - '**/*.yml'
+      - '**/setup.py'
     types: [opened, synchronize, reopened]
 
 jobs:
